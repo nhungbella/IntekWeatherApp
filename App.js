@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import {
-  Text,
-  View,
+import { 
+  Text, 
+  View, 
   StyleSheet,
   TouchableOpacity,
   Linking,
@@ -13,15 +13,25 @@ import {
 
 import Constants from 'expo-constants';
 const cityData = require("./citylist.json")
-const data = {cityData}
 
 export default class WeatherApp extends Component {
   constructor(props) {
     super(props);
+    data = cityData;
     this.state = {
-      typedText: ''
+      typedText: '',
+      selectedName: '',
     };
   }
+
+  renderItem() {
+    items=[];
+    for(let item of data) {
+      items.push(<Picker.Item key={item.name} label={item.name} value={item.name} />)
+    }
+    return items;
+  }
+
   render() {
     return (
       <View style={styles.container}>
@@ -30,16 +40,16 @@ export default class WeatherApp extends Component {
 
         <View style={styles.button}>
           <View style={styles.facebookLogo}>
-            <Image style={{ width: 20, height: 20, padding: 10}}
+            <Image style={{ width: 20, height: 20, padding: 10}} 
                   source = {require('./assets/facebook.png')} />
           </View>
 
           <View style={styles.facebookLogin}>
-            <TouchableOpacity
+            <TouchableOpacity 
               onPress={() => Linking.openURL('https://www.facebook.com')}>
             <Text style={{
               color: 'white',
-              fontSize: 25,
+              fontSize: 20,
               textAlign: 'center',
               justifyContent: 'center',
             }}>Log Out</Text>
@@ -47,7 +57,7 @@ export default class WeatherApp extends Component {
           </View>
         </View>
 
-        <TextInput
+        <TextInput 
           style={styles.inputText}
           placeholder='Input your city'
           placeholderTextColor='gainsboro'
@@ -63,28 +73,22 @@ export default class WeatherApp extends Component {
             }
           }
         />
-
+        
         <View style={styles.listCountry}>
-          <Picker
+          <Picker 
             mode='dropdown'
-            selectedValue={this.state.language}
             style={{height: 30, width: '80%'}}
-            onValueChange={(itemValue, itemIndex) =>
-              this.setState({language: itemValue})
-            }>
-            <Picker.Item label='List Country' value='list' />
-            <Picker.Item label='Java' value='java' />
-            <Picker.Item label='baby' value='js' />
-            <Picker.Item label='dakdja' value='jgfdgs' />
-            <Picker.Item label='dsafegwe' value='gddgjs' />
-            <Picker.Item label='dhfgj' value='jgfds' />
-            <Picker.Item label='JavaSjhkucript' value='jsfdfs' />
-            <Picker.Item label='JavaSnbhfdcript' value='jsjhy' />
+            selectedValue={this.state.selectedName}
+            onValueChange={(value) =>this.setState({selectedName: value})}>
+            {this.renderItem()}
           </Picker>
         </View>
         <ImageBackground source = {require('./assets/sun.png')}
-               style={{ width: 250, height: 200, margin: 200, position: 'relative',}} />
-        <Text style={styles.result}>Result</Text>
+                         style={styles.imageWeather} />
+        <Text style={styles.showCity}>City: {this.state.typedText}</Text>
+        <Text style={styles.showTemperature}>Temperature: {this.state.typedText}</Text>
+        <Text style={styles.showPressure}>Pressure: {this.state.typedText}</Text>
+        <Text style={styles.showHumidity}>Humidity: {this.state.typedText}</Text>
       </View>
     );
   }
@@ -119,14 +123,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'dodgerblue',
     justifyContent: 'center',
     textAlign: 'center',
-    fontSize: 28,
+    fontSize: 25,
     color: 'white',
     paddingTop: 10,
   },
 
   statisticsText: {
     margin: 10,
-    fontSize: 25,
+    fontSize: 20,
     textAlign: 'center',
   },
 
@@ -151,30 +155,57 @@ const styles = StyleSheet.create({
   },
 
   inputText: {
-    height: 50,
+    height: 40,
     width: 250,
     borderColor: 'royalblue',
     borderWidth: 1,
     marginTop: 30,
     textAlign: 'center',
-    fontSize: 25,
+    fontSize: 20,
   },
 
   listCountry: {
     borderColor: 'gainsboro',
     flexDirection: 'row',
     justifyContent: 'center',
-    height: 10,
     width: '80%',
   },
 
-  result: {
+  imageWeather: {
+    position: 'relative',
+    width: 250, 
+    height: 200, 
+    margin: 200, 
     borderWidth: 1,
-    position: 'absolute',
-    marginTop: 500,
-
-
-
+     
   },
 
+  showCity: {
+    position: 'absolute',
+    marginTop: 440,
+    left: 80,
+    fontSize: 20,
+  },
+
+  showTemperature: {
+    position: 'absolute',
+    marginTop: 540,
+    left: 80,
+    fontSize: 18,
+  },
+
+  showPressure: {
+    position: 'absolute',
+    marginTop: 560,
+    left: 80,
+    fontSize: 18,
+  },
+
+  showHumidity: {
+    position: 'absolute',
+    marginTop: 580,
+    left: 80,
+    fontSize: 18,
+  }
+  
 });
