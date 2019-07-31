@@ -12,24 +12,29 @@ import {
 } from 'react-native';
 
 import Constants from 'expo-constants';
-const cityData = require("./citylist.json")
 
 export default class WeatherApp extends Component {
   constructor(props) {
     super(props);
-    data = cityData;
+    
     this.state = {
       typedText: '',
       selectedName: '',
     };
   }
 
-  renderItem() {
-    items=[];
+  renderNameCountry() {
+    let data = require("./citylist.json")
+    let nameCountry = []
     for(let item of data) {
-      items.push(<Picker.Item key={item.name} label={item.name} value={item.name} />)
+      nameCountry.push(<Picker.Item key={item.id} label={item.name} value={item.name}/>)
     }
-    return items;
+    return nameCountry;
+  }
+  renderAPI() {
+    let key = '&APPID=e8e64f2f394529c0fc189e0bcec7251f'
+    let link = 'api.openweathermap.org/data/2.5/weather?q='
+    let q
   }
 
   render() {
@@ -79,13 +84,15 @@ export default class WeatherApp extends Component {
             mode='dropdown'
             style={{height: 30, width: '80%'}}
             selectedValue={this.state.selectedName}
-            onValueChange={(value) =>this.setState({selectedName: value})}>
-            {this.renderItem()}
+            onValueChange={(value) => this.setState({selectedName: value})}>
+            {this.renderNameCountry()}
           </Picker>
         </View>
+
         <ImageBackground source = {require('./assets/sun.png')}
                          style={styles.imageWeather} />
-        <Text style={styles.showCity}>City: {this.state.typedText}</Text>
+
+        <Text style={styles.showCity}>City: {this.state.selectedName}</Text>
         <Text style={styles.showTemperature}>Temperature: {this.state.typedText}</Text>
         <Text style={styles.showPressure}>Pressure: {this.state.typedText}</Text>
         <Text style={styles.showHumidity}>Humidity: {this.state.typedText}</Text>
