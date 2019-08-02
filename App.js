@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 
 import Constants from 'expo-constants';
-import HttpWeather from './components/dataWeather.js'
+
 
 export default class WeatherApp extends Component {
   constructor(props) {
@@ -21,7 +21,27 @@ export default class WeatherApp extends Component {
     this.state = {
       typedText: '',
       selectedName: '',
+      data: '',
+      weather: '',
     };
+  }
+
+  componentDidMount = (value) => {
+    this.setState({ selectedName: value })
+    fetch('http://api.openweathermap.org/data/2.5/weather?units=metric&APPID=e8e64f2f394529c0fc189e0bcec7251f&q=' + this.state.selectedName + ',vn', {
+      method: 'GET'
+    })
+    .then((response) => response.json())
+    .then((responseJson) => {
+      console.log(responseJson);
+      this.setState({
+        data: responseJson.main,
+        weather: responseJson.weather[0],
+      })
+    })
+    .catch((error) => {
+      console.error(error);
+    });
   }
 
   renderNameCity() {
@@ -34,7 +54,7 @@ export default class WeatherApp extends Component {
     }
     return nameCity;
   }
-
+ 
   render() {
     return (
       <View style={styles.container}>
@@ -69,13 +89,10 @@ export default class WeatherApp extends Component {
           style={styles.inputText}
           placeholder="Input your city"
           placeholderTextColor="gainsboro"
-          onChangeText={text => {
-            this.setState(previousState => {
-              return {
-                typedText: text,
-              };
-            });
-          }}
+          clearTextOnFocus='true'
+          autoCapitalize='words'
+          value={`${this.state.selectedName}`}
+          onChangeText={text => this.setState({ selectedName: text })}
         />
 
         <View style={styles.listCountry}>
@@ -83,22 +100,29 @@ export default class WeatherApp extends Component {
             mode="dropdown"
             style={{ height: 30, width: '80%' }}
             selectedValue={this.state.selectedName}
-            onValueChange={value => this.setState({ selectedName: value })}>
+            onValueChange={value => {this.componentDidMount(value)}}>
             {this.renderNameCity()}
           </Picker>
         </View>
-       
         <ImageBackground
-          source={require('./assets/sun.png')}
+          // source={{uri: 'http://openweathermap.org/img/w/02n.png'}}
+          source={{uri: 'http://openweathermap.org/img/w/' + this.state.weather.icon + '.png'}}
           style={styles.imageWeather}
         />
-        <View style={styles.results}> 
-        <HttpWeather />
+        <View style={styles.results}>
+          <Text style={{fontSize: 18}}>
+          Temperature: { Math.ceil(this.state.data.temp) } °C
+          </Text>
+          <Text style={{fontSize: 18}}>
+            Pressure: { this.state.data.pressure } hPa
+          </Text>
+          <Text style={{fontSize: 18}}>
+            Humidity: { this.state.data.humidity } %
+          </Text>
+          <Text> {this.state.weather.icon} </Text>
         </View>
         <Text style={styles.showCity}>City: {this.state.selectedName}</Text>
         
-
-       
       </View>
     );
   }
@@ -106,18 +130,6 @@ export default class WeatherApp extends Component {
 
 // hien du lieu input
 // <Text>{this.state.typedText}</Text>
-
-// <View style={{width:'60%',flexDirection: 'row',justifyContent: 'center'}}>
-//   <Picker mode="dropdown" style={{ height:20, backgroundColor: 'white',width: '80%'}}>
-//     {
-//       data.map((item) =>{
-//         return(
-//         <Picker.Item  label={item.name} value={item.name} key={item.name}/>
-//         );
-//       })
-//     }
-//   </Picker>
-// </View>
 
 const styles = StyleSheet.create({
   container: {
@@ -187,6 +199,8 @@ const styles = StyleSheet.create({
     height: 200,
     margin: 200,
     borderWidth: 1,
+    opacity: 0.5,
+    backgroundColor: 'lightcyan',
   },
 
   showCity: {
@@ -197,7 +211,7 @@ const styles = StyleSheet.create({
   },
 
   results: {
-    position: 'absolute', 
+    position: 'absolute',
     marginTop: 540,
     left: 80,
   },
