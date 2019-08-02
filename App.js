@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
-import { 
-  Text, 
-  View, 
+import {
+  Text,
+  View,
   StyleSheet,
   TouchableOpacity,
   Linking,
@@ -12,29 +12,27 @@ import {
 } from 'react-native';
 
 import Constants from 'expo-constants';
+import HttpWeather from './components/dataWeather.js'
 
 export default class WeatherApp extends Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       typedText: '',
       selectedName: '',
     };
   }
 
-  renderNameCountry() {
-    let data = require("./citylist.json")
-    let nameCountry = []
-    for(let item of data) {
-      nameCountry.push(<Picker.Item key={item.id} label={item.name} value={item.name}/>)
+  renderNameCity() {
+    let data = require('./citylist.json');
+    let nameCity = [];
+    for (let item of data) {
+      nameCity.push(
+        <Picker.Item key={item.id} label={item.name} value={item.name} />
+      );
     }
-    return nameCountry;
-  }
-  renderAPI() {
-    let key = '&APPID=e8e64f2f394529c0fc189e0bcec7251f'
-    let link = 'api.openweathermap.org/data/2.5/weather?q='
-    let q
+    return nameCity;
   }
 
   render() {
@@ -45,57 +43,62 @@ export default class WeatherApp extends Component {
 
         <View style={styles.button}>
           <View style={styles.facebookLogo}>
-            <Image style={{ width: 20, height: 20, padding: 10}} 
-                  source = {require('./assets/facebook.png')} />
+            <Image
+              style={{ width: 20, height: 20, padding: 10 }}
+              source={require('./assets/facebook.png')}
+            />
           </View>
 
           <View style={styles.facebookLogin}>
-            <TouchableOpacity 
+            <TouchableOpacity
               onPress={() => Linking.openURL('https://www.facebook.com')}>
-            <Text style={{
-              color: 'white',
-              fontSize: 20,
-              textAlign: 'center',
-              justifyContent: 'center',
-            }}>Log Out</Text>
+              <Text
+                style={{
+                  color: 'white',
+                  fontSize: 20,
+                  textAlign: 'center',
+                  justifyContent: 'center',
+                }}>
+                Log Out
+              </Text>
             </TouchableOpacity>
           </View>
         </View>
 
-        <TextInput 
+        <TextInput
           style={styles.inputText}
-          placeholder='Input your city'
-          placeholderTextColor='gainsboro'
-          onChangeText={
-            (text) => {
-              this.setState(
-                (previousState) => {
-                  return {
-                    typedText: text
-                  };
-                }
-              );
-            }
-          }
+          placeholder="Input your city"
+          placeholderTextColor="gainsboro"
+          onChangeText={text => {
+            this.setState(previousState => {
+              return {
+                typedText: text,
+              };
+            });
+          }}
         />
-        
+
         <View style={styles.listCountry}>
-          <Picker 
-            mode='dropdown'
-            style={{height: 30, width: '80%'}}
+          <Picker
+            mode="dropdown"
+            style={{ height: 30, width: '80%' }}
             selectedValue={this.state.selectedName}
-            onValueChange={(value) => this.setState({selectedName: value})}>
-            {this.renderNameCountry()}
+            onValueChange={value => this.setState({ selectedName: value })}>
+            {this.renderNameCity()}
           </Picker>
         </View>
-
-        <ImageBackground source = {require('./assets/sun.png')}
-                         style={styles.imageWeather} />
-
+       
+        <ImageBackground
+          source={require('./assets/sun.png')}
+          style={styles.imageWeather}
+        />
+        <View style={styles.results}> 
+        <HttpWeather />
+        </View>
         <Text style={styles.showCity}>City: {this.state.selectedName}</Text>
-        <Text style={styles.showTemperature}>Temperature: {this.state.typedText}</Text>
-        <Text style={styles.showPressure}>Pressure: {this.state.typedText}</Text>
-        <Text style={styles.showHumidity}>Humidity: {this.state.typedText}</Text>
+        
+
+       
       </View>
     );
   }
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   facebookLogo: {
     flex: 8,
     alignSelf: 'center',
-    padding:5,
+    padding: 5,
   },
 
   facebookLogin: {
@@ -180,11 +183,10 @@ const styles = StyleSheet.create({
 
   imageWeather: {
     position: 'relative',
-    width: 250, 
-    height: 200, 
-    margin: 200, 
+    width: 250,
+    height: 200,
+    margin: 200,
     borderWidth: 1,
-     
   },
 
   showCity: {
@@ -194,25 +196,9 @@ const styles = StyleSheet.create({
     fontSize: 20,
   },
 
-  showTemperature: {
-    position: 'absolute',
+  results: {
+    position: 'absolute', 
     marginTop: 540,
     left: 80,
-    fontSize: 18,
   },
-
-  showPressure: {
-    position: 'absolute',
-    marginTop: 560,
-    left: 80,
-    fontSize: 18,
-  },
-
-  showHumidity: {
-    position: 'absolute',
-    marginTop: 580,
-    left: 80,
-    fontSize: 18,
-  }
-  
 });
