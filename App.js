@@ -10,9 +10,10 @@ import {
   Picker,
   ImageBackground,
 } from 'react-native';
-
 import Constants from 'expo-constants';
 
+const API = 'http://api.openweathermap.org/data/2.5/weather?q=';
+const DEFAULT_COUNTRY = ',VN&units=metric&APPID=e8e64f2f394529c0fc189e0bcec7251f';
 
 export default class WeatherApp extends Component {
   constructor(props) {
@@ -20,24 +21,23 @@ export default class WeatherApp extends Component {
 
     this.state = {
       typedText: '',
-      selectedName: '',
       data: '',
       weather: '',
     };
   }
 
-  componentDidMount = (value) => {
-    this.setState({ selectedName: value })
-    fetch('http://api.openweathermap.org/data/2.5/weather?units=metric&APPID=e8e64f2f394529c0fc189e0bcec7251f&q=' + this.state.selectedName + ',vn', {
+  findData = (value) => {
+     this.setState({ typedText: value })
+    fetch(API + this.state.typedText + DEFAULT_COUNTRY, {
       method: 'GET'
     })
     .then((response) => response.json())
     .then((responseJson) => {
-      console.log(responseJson);
+      console.log('this weather=', responseJson.id)
       this.setState({
         data: responseJson.main,
         weather: responseJson.weather[0],
-      })
+      });
     })
     .catch((error) => {
       console.error(error);
@@ -54,7 +54,7 @@ export default class WeatherApp extends Component {
     }
     return nameCity;
   }
- 
+
   render() {
     return (
       <View style={styles.container}>
@@ -68,7 +68,6 @@ export default class WeatherApp extends Component {
               source={require('./assets/facebook.png')}
             />
           </View>
-
           <View style={styles.facebookLogin}>
             <TouchableOpacity
               onPress={() => Linking.openURL('https://www.facebook.com')}>
@@ -79,7 +78,7 @@ export default class WeatherApp extends Component {
                   textAlign: 'center',
                   justifyContent: 'center',
                 }}>
-                Log Out
+                Continue with Facebook
               </Text>
             </TouchableOpacity>
           </View>
@@ -89,29 +88,37 @@ export default class WeatherApp extends Component {
           style={styles.inputText}
           placeholder="Input your city"
           placeholderTextColor="gainsboro"
-          clearTextOnFocus='true'
+          selectTextOnFocus='true'
           autoCapitalize='words'
-          value={`${this.state.selectedName}`}
-          onChangeText={text => this.setState({ selectedName: text })}
+          value={ this.state.typedText }
+          onChangeText={itemText => this.setState({ typedText : itemText })}
+          onSubmitEditing={action => {
+            if (action.key==='Enter') {
+              this.findData(this.state.typedText);
+            }
+          }}
         />
 
         <View style={styles.listCountry}>
           <Picker
             mode="dropdown"
             style={{ height: 30, width: '80%' }}
-            selectedValue={this.state.selectedName}
-            onValueChange={value => {this.componentDidMount(value)}}>
+            selectedValue={this.state.typedText}
+            onValueChange={itemValue => this.findData(itemValue)}>
             {this.renderNameCity()}
           </Picker>
         </View>
+
         <ImageBackground
-          // source={{uri: 'http://openweathermap.org/img/w/02n.png'}}
           source={{uri: 'http://openweathermap.org/img/w/' + this.state.weather.icon + '.png'}}
           style={styles.imageWeather}
         />
+
+        <Text style={styles.showCity}>City: {this.state.typedText}</Text>
+
         <View style={styles.results}>
           <Text style={{fontSize: 18}}>
-          Temperature: { Math.ceil(this.state.data.temp) } °C
+          Temperature: { this.state.data.temp } °C
           </Text>
           <Text style={{fontSize: 18}}>
             Pressure: { this.state.data.pressure } hPa
@@ -119,15 +126,18 @@ export default class WeatherApp extends Component {
           <Text style={{fontSize: 18}}>
             Humidity: { this.state.data.humidity } %
           </Text>
-          <Text> {this.state.weather.icon} </Text>
+
         </View>
-        <Text style={styles.showCity}>City: {this.state.selectedName}</Text>
-        
       </View>
     );
   }
 }
+ // onSubmitEditing={action => {
+          //   if (action.key==='Enter') {
+          //     {this.componentDidMount(this.state.typedText)}
 
+// onValueChange={value => {this.componentDidMount(value)}}>
+// {this.renderNameCity()}
 // hien du lieu input
 // <Text>{this.state.typedText}</Text>
 
@@ -198,7 +208,6 @@ const styles = StyleSheet.create({
     width: 250,
     height: 200,
     margin: 200,
-    borderWidth: 1,
     opacity: 0.5,
     backgroundColor: 'lightcyan',
   },
